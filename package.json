@@ -1,6 +1,6 @@
 {
-  "name": "relation",
-  "version": "0.1.0",
+  "name": "um-relation",
+  "version": "0.1.1",
   "description": "",
   "bin": {
     "relation": "dist/cli/index.js"
@@ -21,6 +21,7 @@
     "mysql": "^2.11.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-plugin-transform-async-functions": "^6.8.0",
     "babel-plugin-transform-class-properties": "^6.18.0",
     "babel-plugin-transform-object-rest-spread": "^6.16.0",

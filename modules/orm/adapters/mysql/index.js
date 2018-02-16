@@ -44,6 +44,18 @@ class MysqlAdapter {
     })
   }
 
+  update({model,data}){
+
+    var query = `UPDATE ${model.tableName()} SET ? WHERE ${model.primaryKey()} = ?`
+
+    return new Promise((resolve, reject) => {
+      connection.query(query,[data,data[model.primaryKey()]],  (error, result) => {
+        if(error) return reject(error)
+        resolve(true, model)
+      })
+    })
+  }
+
   /*
     returns a new query builder instance
   */
@@ -75,6 +87,7 @@ class MysqlAdapter {
   */
 
   makeRelatable(result, model) {
+    if(result == undefined) return null;
     return new Proxy(result, {
       get(target, name) {
         if(name in target) return target[name]

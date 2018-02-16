@@ -1,5 +1,5 @@
 import adapter from './adapters'
-import { getTableName, getFieldName } from '../global/get-name'
+import { getTableName, getFieldName, getPrimaryKey } from '../global/get-name'
 
 export default class Model {
   constructor(values) {
@@ -12,6 +12,10 @@ export default class Model {
   */
   static tableName() {
     return getTableName(this.name)
+  }
+
+  static getPrimaryKey(){
+    return getPrimaryKey(this.name);
   }
 
   /*

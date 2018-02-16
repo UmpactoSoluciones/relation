@@ -71,6 +71,7 @@ async function getChats {
 - `.all()` returns everything in the table
 - `.where({ fieldName: 'value' })` returns any matching results
 - `.create({ field: 'value'})` create a new row
+- `.update({ field: 'value',primaryKey:'value'})` update an existing row
 - `.select('column', 'column2')` contrain rows to select
 - `.first()` returns first results
 - `.limit(5)` limits the query
