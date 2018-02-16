@@ -15,7 +15,7 @@ export default class Model {
   }
 
   static getPrimaryKey(){
-    return getPrimaryKey(this.name);
+    return getPrimaryKey(this);
   }
 
   /*
@@ -32,6 +32,12 @@ export default class Model {
   */
   static first() {
     return adapter.select({ limit: 1, model: this })
+  }
+
+  static find(id){
+    var q = {};
+    q[this.getPrimaryKey()] = id;
+    return this.where(q).first();
   }
 
   /*

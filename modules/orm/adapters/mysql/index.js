@@ -51,6 +51,12 @@ class MysqlAdapter {
     return new Promise((resolve, reject) => {
       connection.query(query,[data,data[model.primaryKey()]],  (error, result) => {
         if(error) return reject(error)
+        var err = {
+          message:"Not affect any row"
+        };
+        if (!result.affectedRows > 0){
+          reject(err);
+        }
         resolve(true, model)
       })
     })
