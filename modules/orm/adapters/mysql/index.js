@@ -14,15 +14,28 @@ class MysqlAdapter {
     Builds the mysql query, used query builder and root model class
   */
   select({ model, select, where, limit, joins = [] }) {
+    var whereRaw = '';
+    if(where){
+      if (Object.keys(where).length == 1){
+        whereRaw = ` WHERE ${connection.escape(where)}`;
+      }else if(Object.keys(where).length > 0){
+        whereRaw = ' WHERE ';
+        Object.keys(where).forEach(function(key){
+          var condition = {};
+          condition[key] = where[key];
+          whereRaw += `${connection.escape(condition)} AND `;
+        });
+        whereRaw = whereRaw.substring(0, whereRaw.length-5);
+      }
+    }
+
     return new Promise((resolve, reject) => {
       const options = {
-        sql: `SELECT ${select ? select : '*'} FROM ${model.tableName()}${where ? ` WHERE ${connection.escape(where)}` : ''}${this.getJoins(joins)}${limit ? ` LIMIT ${connection.escape(limit)}` : ''}`,
+        sql: `SELECT ${select ? select : '*'} FROM ${model.tableName()}${whereRaw}${this.getJoins(joins)}${limit ? ` LIMIT ${connection.escape(limit)}` : ''}`,
         nestTables: joins.length > 0 ? true : false
       }
-
       connection.query(options,  (error, results) => {
         if(error) return reject(error)
-
         if(joins.length > 0) results = this.mergeInJoins(results)
         resolve(this.makeRelatable(limit === 1 ? results[0] : results, model))
       })
