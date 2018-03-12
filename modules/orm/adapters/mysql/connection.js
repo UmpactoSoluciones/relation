@@ -4,9 +4,7 @@ const db_config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  socketPath: process.env.DB_SOCKET,
-  waitForConnection: true
+  database: process.env.DB_NAME
 };
 
 var connection
@@ -24,6 +22,7 @@ function handleDisconnect() {
 
   connection.on('error',err => {
     console.error('db error', err)
+    console.log(err.fatal); // true
     console.log('db error code',err.code);
 
     //- The server close the connection.
@@ -35,13 +34,15 @@ function handleDisconnect() {
     //- Connection in closing
     else if(err.code === "PROTOCOL_ENQUEUE_AFTER_QUIT"){
         console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
-        handleDisconnect();
+        //handleDisconnect();
+        //connection.connect();
     }
 
     //- Fatal error : connection variable must be recreated
     else if(err.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR"){
         console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
-        handleDisconnect();
+        //  connection.end();
+          //handleDisconnect();
     }
 
     //- Error because a connection is already being established
@@ -52,11 +53,11 @@ function handleDisconnect() {
     //- Anything else
     else{
         console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
-        handleDisconnect();
+      //  handleDisconnect();
     }
   })
 }
 
 handleDisconnect()
 
-export default connection
+export {connection,handleDisconnect}

@@ -1,4 +1,4 @@
-import connection from './connection'
+import {connection,handleDisconnect} from './connection'
 import Builder from './builder'
 import { getTableName } from '../../../global/get-name'
 
@@ -34,11 +34,18 @@ class MysqlAdapter {
         sql: `SELECT ${select ? select : '*'} FROM ${model.tableName()}${whereRaw}${this.getJoins(joins)}${limit ? ` LIMIT ${connection.escape(limit)}` : ''}`,
         nestTables: joins.length > 0 ? true : false
       }
-      connection.query(options,  (error, results) => {
-        if(error) return reject(error)
-        if(joins.length > 0) results = this.mergeInJoins(results)
-        resolve(this.makeRelatable(limit === 1 ? results[0] : results, model))
-      })
+        connection.query(options,  (error, results) => {
+          if(error) {
+            if(error.fatal){
+                handleDisconnect();
+            }
+            return reject(error);
+          }
+          if(joins.length > 0) results = this.mergeInJoins(results)
+          resolve(this.makeRelatable(limit === 1 ? results[0] : results, model))
+        })
+
+
     })
   }
 
@@ -48,7 +55,12 @@ class MysqlAdapter {
   create({ model, data }) {
     return new Promise((resolve, reject) => {
       connection.query(`INSERT INTO ${model.tableName()} SET ?`, data,  (error, result) => {
-        if(error) return reject(error)
+        if(error) {
+          if(error.fatal){
+              handleDisconnect();
+          }
+          return reject(error);
+        }
         resolve(this.makeRelatable({
           id: result.insertId,
           ...data
@@ -63,7 +75,12 @@ class MysqlAdapter {
 
     return new Promise((resolve, reject) => {
       connection.query(query,[data,data[model.primaryKey()]],  (error, result) => {
-        if(error) return reject(error)
+        if(error) {
+          if(error.fatal){
+              handleDisconnect();
+          }
+          return reject(error);
+        }
         var err = {
           message:"Not affect any row"
         };
